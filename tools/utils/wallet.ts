@@ -1,6 +1,7 @@
 import { createWalletClient, createPublicClient, http } from "viem";
 import { mnemonicToAccount, privateKeyToAccount } from "viem/accounts";
 import { base } from "viem/chains";
+import type { WalletClient } from "viem"; // Import the WalletClient type
 
 const mnemonic = process.env.MNEMONIC;
 const privateKey = process.env.PRIVATE_KEY;
@@ -18,13 +19,13 @@ const account = mnemonic
   ? mnemonicToAccount(mnemonic)
   : privateKeyToAccount(privateKey as `0x${string}`);
 
-export const publicClient = createPublicClient({
+export const myPublicClient = createPublicClient({
   chain: base,
   transport: http(rpcUrl),
 });
 
-export const walletClient = createWalletClient({
+export const myWalletClient: WalletClient = createWalletClient({ // Explicit type annotation
   account: account,
   chain: base,
   transport: http(rpcUrl),
-}); 
+});

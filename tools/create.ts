@@ -2,7 +2,8 @@ import { z } from "zod";
 import { tool } from "@langchain/core/tools";
 import { createCoin } from "@zoralabs/coins-sdk";
 import { type Address } from "viem";
-import { publicClient, walletClient } from "./wallet";
+import { myPublicClient, myWalletClient } from "./utils/wallet";
+
 
 type CreateCoinArgs = {
   name: string;             // The name of the coin (e.g., "My Awesome Coin")
@@ -18,7 +19,7 @@ type CreateCoinArgs = {
 const createCoinTool = tool(
   async (args: CreateCoinArgs) => {
     try {
-      const result = await createCoin(args, walletClient, publicClient);
+      const result = await createCoin(args, myWalletClient, myPublicClient);
 
       return `Coin created successfully!
 Transaction hash: ${result.hash}

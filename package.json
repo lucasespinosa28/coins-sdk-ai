@@ -1,9 +1,32 @@
 {
   "name": "coins-sdk-ai",
-  "module": "index.ts",
+  "version": "0.1.0",
+  "description": "AI-powered tools for interacting with Zora's coin SDK and other blockchain operations",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.js",
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "blockchain",
+    "nft",
+    "erc20",
+    "zora",
+    "ai",
+    "langchain"
+  ],
+  "author": "",
+  "license": "MIT",
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript": "^5.0.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"

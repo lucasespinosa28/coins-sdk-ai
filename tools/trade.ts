@@ -1,10 +1,9 @@
 import { z } from "zod";
 import { tool } from "@langchain/core/tools";
 import { tradeCoin } from "@zoralabs/coins-sdk";
-import { type Address, parseEther } from "viem";
-import { walletClient, publicClient } from "./wallet";
-
-
+import { type Address, parseEther, formatEther } from "viem";
+import { myWalletClient, myPublicClient } from "./utils/wallet";
+import processBigIntValues from "./utils/convertBigInt";
 type TradeParams = {
   direction: "sell" | "buy";  // The trade direction
   target: Address;            // The target coin contract address
@@ -17,18 +16,38 @@ type TradeParams = {
   };
 };
 
-
 const tradeCoinTool = tool(
   async (params: TradeParams) => {
     try {
-      const result = await tradeCoin(params, walletClient, publicClient);
+      params.args.orderSize = parseEther(params.args.orderSize.toString());
+      if (params.args.minAmountOut === undefined) {
+        params.args.minAmountOut = 0n;
+      }
+      const result = await tradeCoin(params, myWalletClient, myPublicClient);
 
-      return `Trade executed successfully!
-Transaction hash: ${result.hash}
-Trade details: ${JSON.stringify(result.trade)}
-Receipt: ${JSON.stringify(result.receipt)}`;
+      if (!result.trade) {
+        throw new Error("Trade result is undefined");
+      }
+
+      // Process the entire result object to handle BigInt values
+      const processedResult = processBigIntValues({
+        status: "success",
+        transaction: {
+          hash: result.hash,
+          status: result.receipt.status,
+          blockNumber: result.receipt.blockNumber,
+          gasUsed: result.receipt.gasUsed,
+          effectiveGasPrice: result.receipt.effectiveGasPrice
+        },
+        trade: result.trade
+      });
+
+      return JSON.stringify(processedResult, null, 2);
     } catch (error) {
-      return `Error executing trade: ${error}`;
+      return JSON.stringify({
+        status: "error",
+        message: error instanceof Error ? error.message : "Unknown error occurred"
+      });
     }
   },
   {
